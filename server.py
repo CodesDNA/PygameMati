@@ -66,4 +66,4 @@ player_positions = [(100, 100), (W-100-RectW, 100)]  # Initial positions for pla
 while True:
     conn, addr = s.accept()
     threading.Thread(target=handle_client, args=(conn, addr, current_player)).start()
-    current_player += 1
+    current_player = 1 + (current_player % 2)  # Alternate between 1 and 2
