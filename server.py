@@ -2,10 +2,36 @@ import socket
 import threading  
 import pickle  
 from settings import *
+import subprocess
+import miniupnpc
 
 
 server_ip = "192.168.1.130"
 port = 5555
+
+# firewall rule to allow incoming connections on the specified port
+rule_name = "MyGameServer"
+
+subprocess.run(
+    f'netsh advfirewall firewall add rule '
+    f'name="{rule_name}" dir=in action=allow protocol=TCP localport={port}',
+    shell=True
+)
+
+# Set up UPnP port forwarding
+upnp = miniupnpc.UPnP()
+upnp.discover()
+upnp.selectigd()
+
+external_port = 5555
+internal_port = 5555
+
+upnp.addportmapping(
+    external_port, 'TCP',
+    upnp.lanaddr, internal_port,
+    'MyGameServer', ''
+)
+
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
