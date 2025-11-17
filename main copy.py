@@ -1,6 +1,7 @@
 import pygame
 from networkClass import Network
 from settings import *
+import pickle
 
 pygame.init() # Init pygame
 
