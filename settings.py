@@ -9,4 +9,3 @@ WHT, BLU, RED, BLK = (255, 255, 255), (0, 200, 255), (255, 0, 0), (0, 0, 0) # Co
 
 # Clock
 clock = pygame.time.Clock()
-clock.tick(60)

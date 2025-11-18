@@ -14,7 +14,7 @@ class Player:
         self.width = width
         self.height = height
         self.color = color
-        self.move_speed = 0.5
+        self.move_speed = 3
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
@@ -61,6 +61,8 @@ while running:
     player2.draw(win) # Draw player2
 
     pygame.display.flip()
+
+    clock.tick(60) # Frame rate 60 FPS
 
 # Quit Pygame
 pygame.quit()
