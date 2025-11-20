@@ -94,12 +94,16 @@ class Reaper(pygame.sprite.Sprite):
             "right":
                 {
                     "idle": load_sprite_sheet(self.spritesheet_list_path, "idle.png", 18, scale_to_height=100),
-                    "running": load_sprite_sheet(self.spritesheet_list_path, "running.png", 12, scale_to_height=100)
+                    "running": load_sprite_sheet(self.spritesheet_list_path, "running.png", 12, scale_to_height=100),
+                    "idle_slashing": load_sprite_sheet(self.spritesheet_list_path, "idle_slashing.png", 12, scale_to_height=100),
+                    "running_slashingg": load_sprite_sheet(self.spritesheet_list_path, "running_slashing.png", 12, scale_to_height=100)
                 },
             "left":
                 {
                     "idle": load_sprite_sheet(self.spritesheet_list_path, "idle.png", 18, scale_to_height=100, flipped=True),
-                    "running": load_sprite_sheet(self.spritesheet_list_path, "running.png", 12, scale_to_height=100, flipped=True)
+                    "running": load_sprite_sheet(self.spritesheet_list_path, "running.png", 12, scale_to_height=100, flipped=True),
+                    "idle_slashing": load_sprite_sheet(self.spritesheet_list_path, "idle_slashing.png", 12, scale_to_height=100, flipped=True),
+                    "running_slashingg": load_sprite_sheet(self.spritesheet_list_path, "running_slashing.png", 12, scale_to_height=100, flipped=True)
                 },
         }
 
@@ -117,6 +121,10 @@ class Reaper(pygame.sprite.Sprite):
         # we want pixels per second, and will use dt to scale movement
         self.speed =  200 
 
+        # Slashing animation flag
+        # we use this to track if we are in slashing animation, so we don't interrupt it
+        self.slashing_animation = False
+
         # Animation speed in frames per second
         self.fps = fps
         self.time_per_frame = 1 / fps  # seconds per frame
@@ -124,7 +132,7 @@ class Reaper(pygame.sprite.Sprite):
                                     # to manage frame updates
 
 
-    def update(self, dt, keys):
+    def update(self, dt, keys, mouse_buttons):
         """
         the update method to be called each frame to update the sprite state
         Args:
@@ -150,44 +158,57 @@ class Reaper(pygame.sprite.Sprite):
                 both will change frames every second
                 
             keys (list): List of pressed keys from pygame.key.get_pressed()
+            mouse_buttons (list): List of pressed mouse buttons from pygame.mouse.get_pressed()
+        Returns: None
         """
 
         # we use this to store movement in x and y direction
         movepos = [0, 0]
         # Flag to check if the character is moving (for idle/running state)
         moving = False
+
+        # Check for slashing action
+        slashing = mouse_buttons[0]  # Left mouse button for slashing
+        if slashing and not self.slashing_animation:
+            self.slashing_animation = True
+            self.current_frame = 0
         
         if keys[pygame.K_LEFT]:
             movepos[0] = movepos[0] - self.speed * dt
             self.face_direction = "left"
             if self.state != "running":
                 self.state = "running"
-                self.current_frame = 0
+                if not self.slashing_animation:
+                    self.current_frame = 0
             moving = True
         if keys[pygame.K_RIGHT]:
             movepos[0] = movepos[0] + self.speed * dt
             self.face_direction = "right"
             if self.state != "running":
                 self.state = "running"
-                self.current_frame = 0
+                if not self.slashing_animation:
+                    self.current_frame = 0
             moving = True
         if keys[pygame.K_UP]:
             movepos[1] = movepos[1] - self.speed * dt
             if self.state != "running":
                 self.state = "running"
-                self.current_frame = 0
+                if not self.slashing_animation:
+                    self.current_frame = 0
             moving = True
         if keys[pygame.K_DOWN]:
             movepos[1] = movepos[1] + self.speed * dt
             if self.state != "running":
                 self.state = "running"
-                self.current_frame = 0
+                if not self.slashing_animation:
+                    self.current_frame = 0
             moving = True
 
         if not moving:
             if self.state != "idle":
                 self.state = "idle"
-                self.current_frame = 0
+                if not self.slashing_animation:
+                    self.current_frame = 0
 
         # Update position with collision detection against screen borders
         # we create a new rect with the proposed new position
@@ -197,16 +218,38 @@ class Reaper(pygame.sprite.Sprite):
             # if yes, update the rect position
             # else we ignore the movement
             self.rect = newpos
+        
 
         # Update animation frame
         self.dt_accumulator += dt
         if self.dt_accumulator >= self.time_per_frame:
-            self.dt_accumulator = 0
-            self.current_frame += 1
-            frames = self.spritesheets_dict[self.face_direction][self.state]
-            if self.current_frame >= len(frames):
-                self.current_frame = 0
-            self.image = frames[self.current_frame]
+            
+            if self.slashing_animation:
+                # During slashing, use slashing animations                
+                if self.state == "idle":
+                    self.state = "idle_slashing"
+                elif self.state == "running":
+                    self.state = "running_slashingg"
+
+                frames = self.spritesheets_dict[self.face_direction][self.state]
+                self.current_frame += 1
+                if self.current_frame >= len(frames):
+                    # End of slashing animation
+                    self.slashing_animation = False
+                    self.current_frame = 0
+                    # Return to normal state
+                    if moving:
+                        self.state = "running"
+                    else:
+                        self.state = "idle"
+                self.image = frames[self.current_frame]
+            else:
+                self.dt_accumulator = 0
+                self.current_frame += 1
+                frames = self.spritesheets_dict[self.face_direction][self.state]
+                if self.current_frame >= len(frames):
+                    self.current_frame = 0
+                self.image = frames[self.current_frame]
         
 
 
@@ -249,8 +292,9 @@ def main():
         screen.blit(background, (0, 0))
 
         keys = pygame.key.get_pressed()
+        mouse_buttons = pygame.mouse.get_pressed()
         
-        all_sprites.update(dt, keys)
+        all_sprites.update(dt, keys, mouse_buttons)
         all_sprites.draw(screen)
 
         pygame.display.flip()

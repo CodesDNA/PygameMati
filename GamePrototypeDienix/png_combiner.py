@@ -39,6 +39,6 @@ def make_spritesheet(folder_path, output_file):
 # Example use
 if __name__ == "__main__":
     make_spritesheet(
-        r"GamePrototypeDienix\sprites\Reaper_Man_1\PNG\PNG Sequences\Running",
-        r"GamePrototypeDienix\spritesheets\running.png"
+        r"GamePrototypeDienix\sprites\Reaper_Man_1\PNG\PNG Sequences\Run Slashing",
+        r"GamePrototypeDienix\spritesheets\running_slashing.png"
     )
