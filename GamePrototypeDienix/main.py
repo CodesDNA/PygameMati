@@ -70,7 +70,7 @@ class Reaper(pygame.sprite.Sprite):
     """
 
     def __init__(self, path, fps=10):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
         """
         We use Sprite class from pygame to manage our character
         we do that in  order to be able to use the inherited Sprite methods
@@ -223,6 +223,7 @@ class Reaper(pygame.sprite.Sprite):
         # Update animation frame
         self.dt_accumulator += dt
         if self.dt_accumulator >= self.time_per_frame:
+            self.dt_accumulator = 0
             
             if self.slashing_animation:
                 # During slashing, use slashing animations                
@@ -244,7 +245,6 @@ class Reaper(pygame.sprite.Sprite):
                         self.state = "idle"
                 self.image = frames[self.current_frame]
             else:
-                self.dt_accumulator = 0
                 self.current_frame += 1
                 frames = self.spritesheets_dict[self.face_direction][self.state]
                 if self.current_frame >= len(frames):
@@ -271,6 +271,7 @@ def main():
     text = "Move with WASD | Attack with Left Mouse Click"
     text_surface = font.render(text, True, (255, 255, 255))
     text_rect = text_surface.get_rect(center=(screen.get_width() // 2, 60))
+    background.blit(text_surface, text_rect)
 
     # Initialise players
     sprite_seet_path = r"GamePrototypeDienix\spritesheets"
@@ -297,9 +298,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.blit(background, (0, 0))
-
-        screen.blit(text_surface, text_rect)
+        screen.blit(background, (0, 0))        
 
         keys = pygame.key.get_pressed()
         mouse_buttons = pygame.mouse.get_pressed()
