@@ -173,7 +173,7 @@ class Reaper(pygame.sprite.Sprite):
             self.slashing_animation = True
             self.current_frame = 0
         
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_a]:
             movepos[0] = movepos[0] - self.speed * dt
             self.face_direction = "left"
             if self.state != "running":
@@ -181,7 +181,7 @@ class Reaper(pygame.sprite.Sprite):
                 if not self.slashing_animation:
                     self.current_frame = 0
             moving = True
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_d]:
             movepos[0] = movepos[0] + self.speed * dt
             self.face_direction = "right"
             if self.state != "running":
@@ -189,14 +189,14 @@ class Reaper(pygame.sprite.Sprite):
                 if not self.slashing_animation:
                     self.current_frame = 0
             moving = True
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_w]:
             movepos[1] = movepos[1] - self.speed * dt
             if self.state != "running":
                 self.state = "running"
                 if not self.slashing_animation:
                     self.current_frame = 0
             moving = True
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_s]:
             movepos[1] = movepos[1] + self.speed * dt
             if self.state != "running":
                 self.state = "running"
@@ -264,6 +264,14 @@ def main():
     background = background.convert()
     background.fill((0, 0, 0))
 
+    # Initialise font
+    font = pygame.font.Font(None, 32)
+
+    # Render text 
+    text = "Move with WASD | Attack with Left Mouse Click"
+    text_surface = font.render(text, True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=(screen.get_width() // 2, 60))
+
     # Initialise players
     sprite_seet_path = r"GamePrototypeDienix\spritesheets"
     player1 = Reaper(sprite_seet_path, fps=20)
@@ -290,6 +298,8 @@ def main():
                 running = False
 
         screen.blit(background, (0, 0))
+
+        screen.blit(text_surface, text_rect)
 
         keys = pygame.key.get_pressed()
         mouse_buttons = pygame.mouse.get_pressed()
