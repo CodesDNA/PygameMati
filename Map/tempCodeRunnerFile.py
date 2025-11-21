@@ -1,0 +1,1 @@
+, [sturdy_walls, broken_walls]
