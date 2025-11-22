@@ -1,1 +1,1 @@
-, [sturdy_walls, broken_walls]
+elf.collision_borders

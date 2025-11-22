@@ -14,7 +14,7 @@ screen = pygame.display.set_mode((draw_width, draw_height))
 
 
 explosion_fire_image = pygame.image.load(
-    r"C:\Users\giorg\Documents\GitHub\PygameMati\Images\ExplosionFire.png"
+    r"Images\ExplosionFire.png"
 )
 
 
@@ -22,16 +22,16 @@ explosion_fire_image = pygame.image.load(
 
 # Explosion sound
 explosion_sound = pygame.mixer.Sound(
-    r"C:\Users\giorg\Documents\GitHub\PygameMati\Sounds\SoundEffects\Bomb.wav"
+    r"Sounds\SoundEffects\Bomb.wav"
 )
 
 # ----- LOAD PRE-EXPLOSION ANIMATION FRAMES -----
 # These will be shown BEFORE the bomb explodes
 pre_explosion_frames = [
-    pygame.image.load(r"C:\Users\giorg\Documents\GitHub\PygameMati\Images\preExplosion1.png"),
-    pygame.image.load(r"C:\Users\giorg\Documents\GitHub\PygameMati\Images\preExplosion2.png"),
-    pygame.image.load(r"C:\Users\giorg\Documents\GitHub\PygameMati\Images\preExplosion3.png"),
-    pygame.image.load(r"C:\Users\giorg\Documents\GitHub\PygameMati\Images\preExplosion4.png")
+    pygame.image.load(r"Images\preExplosion1.png"),
+    pygame.image.load(r"Images\preExplosion2.png"),
+    pygame.image.load(r"Images\preExplosion3.png"),
+    pygame.image.load(r"Images\preExplosion4.png")
 ]
 
 
