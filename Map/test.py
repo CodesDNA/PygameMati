@@ -1,9 +1,10 @@
 import pygame
 import random
 import os
+from player import *
 
 #!!! Only odd numbers for MAP_TILES to ensure maze generation works properly !!!
-MAP_TILES = 19
+MAP_TILES = 13
 
 def load_sprite_sheet(path, spritesheet_file, num_frames = 1, scale_to_height=None, flipped=False):
     """ 
@@ -292,35 +293,74 @@ class Wall(pygame.sprite.Sprite):
 
     def update(self):
         pass
-        
 
-if __name__ == "__main__":
 
+
+def main():
+    # Initialise screen
     pygame.init()
-    screen = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption("Map Test")
-    width, height = screen.get_size()
+    screen = pygame.display.set_mode((1000, 1000))
+    pygame.display.set_caption("Dienix Game Prototype")
 
     map = Map(r"Map\map_tiles_assets", MAP_TILES)
     sturdy_walls = map.sturdy_walls_sprites_group
     broken_walls = map.broken_walls_sprites_group
-    screen.fill((0, 0, 0))
 
     screen.blit(map.image, map.rect)
-    # map.draw()
-    
+
+    # Initialise players
+    sprite_seet_path = r"GamePrototypeDienix\spritesheets"
+    player1 = Reaper(sprite_seet_path, map.collision_borders, fps=40, scale_to_height=map.tile_height, )
+    player1.rect.topleft = map.collision_borders.topleft
+
+    # Initialise sprites
+    all_sprites = pygame.sprite.Group()
+    all_sprites.add(player1)
+
+    # Blit everything to the screen
     pygame.display.flip()
 
+    # Initialise clock
+    clock = pygame.time.Clock()
+
+    # Game loop
     running = True
     while running:
+        dt_ms = clock.tick(60)  # cap at 60 FPS
+        dt = dt_ms / 1000       # dt in seconds
+
+        keys = []
+        mouse_buttons = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            # Key pressed once
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    keys.append("up")
+                elif event.key == pygame.K_a:
+                    keys.append("left")
+                elif event.key == pygame.K_s:
+                    keys.append("down")
+                elif event.key == pygame.K_d:
+                    keys.append("right")
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # 1 = left mouse button
+                    mouse_buttons = True
+
+        screen.blit(map.image, map.rect)
 
         broken_walls.draw(screen)
         sturdy_walls.draw(screen)
+        
+        all_sprites.update(dt, keys, mouse_buttons, [sturdy_walls, broken_walls])
+        all_sprites.draw(screen)
 
         pygame.display.flip()
 
     pygame.quit()
+    
 
+if __name__ == "__main__":
+    main()
