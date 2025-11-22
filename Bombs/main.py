@@ -6,16 +6,19 @@ import pygame
 pygame.init()
 pygame.mixer.init()
 
-# Map size
-WIDTH = HEIGHT = 20
+# ----- WINDOW -----
+draw_width = 400
+draw_height = 400
+screen = pygame.display.set_mode((draw_width, draw_height))
 
-# Create the 20x20 tile map
-game_map = []             
-for y in range(HEIGHT):
-    row = []
-    for x in range(WIDTH):
-        row.append(0)      # 0 = empty tile
-    game_map.append(row)
+
+
+explosion_fire_image = pygame.image.load(
+    r"C:\Users\giorg\Documents\GitHub\PygameMati\Images\ExplosionFire.png"
+)
+
+
+
 
 # Explosion sound
 explosion_sound = pygame.mixer.Sound(
@@ -32,9 +35,11 @@ pre_explosion_frames = [
 ]
 
 
+
+
 # ----- BOMB CLASS -----
 class Bomb:
-    def __init__(self, x, y, reducedTimer, radius, game_map): # x,y = tile coordinates, reducedTimer = seconds to reduce from base time, radius = explosion radius in tiles ( we can add from power ups later )
+    def __init__(self, currentPos , x, y, reducedTimer, radius): # x,y = tile coordinates, reducedTimer = seconds to reduce from base time, radius = explosion radius in tiles ( we can add from power ups later )
        
         """
         reducedTimer = how many SECONDS the player reduces from the bomb.
@@ -49,8 +54,8 @@ class Bomb:
         self.x = x 
         self.y = y 
         self.radius = radius # explosion radius in tiles
-        self.game_map = game_map # reference to the game map
-        self.exploded = False
+     
+        self.exploded = False 
 
         # ----- START THE FIRE/FUSE SOUND HERE -----
         explosion_sound.play()     # ← plays BEFORE the explosion
@@ -61,6 +66,10 @@ class Bomb:
         self.frame_duration = 1.0 
         self.frame_timer = self.frame_duration
         self.show_animation = True
+
+         # after explision image
+        self.explosion_image = explosion_fire_image
+        self.show_explosion_fire = False  # initially hidden
 
 
     def tick(self, dt):
@@ -86,54 +95,72 @@ class Bomb:
         self.exploded = True
         self.show_animation = False
 
+        # Mark explosion on the map
+        # CENTER
 
-        
+        self.show_explosion_fire = True
 
-        self.game_map[self.y][self.x] = 2
 
-        # UP
-        for dy in range(1, self.radius + 1):
-            ty = self.y - dy
-            if 0 <= ty < HEIGHT:
-                self.game_map[ty][self.x] = 2
+        # explosion path
 
-        # DOWN
-        for dy in range(1, self.radius + 1):
-            ty = self.y + dy
-            if 0 <= ty < HEIGHT:
-                self.game_map[ty][self.x] = 2
+        for direction in [(1,0), (-1,0), (0,1), (0,-1)]: # right, left, down, up
+            for step in range(1, self.radius + 1):
+                new_x = self.x + direction[0] * step
+                new_y = self.y + direction[1] * step
+                # Here we would mark the explosion on the map
+                # For this example, we just print the coordinates
+                print(f"Explosion at ({new_x}, {new_y})")
 
-        # LEFT
-        for dx in range(1, self.radius + 1):
-            tx = self.x - dx
-            if 0 <= tx < WIDTH:
-                self.game_map[self.y][tx] = 2
 
-        # RIGHT
-        for dx in range(1, self.radius + 1):
-            tx = self.x + dx
-            if 0 <= tx < WIDTH:
-                self.game_map[self.y][tx] = 2
-
-    
 
    
 
     
 
-# ----- EXAMPLE USAGE WITH deltaTime -----
+# -----  USAGE WITH deltaTime -----
 
 clock = pygame.time.Clock()
 
-bomb1 = Bomb(x=1, y=5, reducedTimer=0, radius=0, game_map=game_map)   # explodes in 4 sec
+bomb1 = Bomb(currentPos=0, x=1, y=5, reducedTimer=0, radius=0)   # explodes in 4 sec
 
 
-for _ in range(300):       # simulate ~5 seconds at 60 FPS
-    dt = clock.tick(60) / 1000.0   # deltaTime in seconds
 
+
+
+
+
+# ----- GAME LOOP -----
+run = True
+while run:
+    dt = clock.tick(60) / 1000.0  # delta time in seconds
+
+    # ----- HANDLE EVENTS -----
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+    # ----- UPDATE BOMB -----
     bomb1.tick(dt)
-   
 
-# Print map to show explosions
-for row in game_map:
-    print(row)
+    # ----- DRAW -----
+    screen.fill((255, 255, 255))  # white background
+
+    # draw pre-explosion animation
+    if bomb1.show_animation:
+        frame_image = bomb1.animation_frames[bomb1.current_frame]
+        frame_image = pygame.transform.scale(frame_image, (draw_width, draw_height))
+        screen.blit(frame_image, (0, 0))
+
+    # draw explosion fire AFTER explosion
+    if bomb1.exploded and bomb1.show_explosion_fire:
+        fire_image = pygame.transform.scale(bomb1.explosion_image, (draw_width, draw_height))
+        screen.blit(fire_image, (0, 0))
+
+    pygame.display.flip()  # update screen
+
+
+pygame.quit()
+
+
+
+
