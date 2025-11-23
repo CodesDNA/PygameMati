@@ -146,8 +146,8 @@ class Map:
         #               the corners will always be empty for players to enter the map
         #               we ALWAYS give odd number of tiles for the map
         #               never even numbers
-        for i in range(1, self.map_tiles-1):
-            for j in range(1, self.map_tiles-1):
+        for i in range(3, self.map_tiles-3):
+            for j in range(3, self.map_tiles-3):
                 if self.maze[i][j] != 0:
                     self.layout[i][j] = 4  # wall_sturdy
 
@@ -299,10 +299,11 @@ class Wall(pygame.sprite.Sprite):
 def main():
     # Initialise screen
     pygame.init()
-    screen = pygame.display.set_mode((1000, 1000))
+    screen = pygame.display.set_mode((1000, 500))
     pygame.display.set_caption("Dienix Game Prototype")
 
     map = Map(r"Map\map_tiles_assets", MAP_TILES)
+    map.draw( )
     sturdy_walls = map.sturdy_walls_sprites_group
     broken_walls = map.broken_walls_sprites_group
 
@@ -345,6 +346,9 @@ def main():
                     keys.append("down")
                 elif event.key == pygame.K_d:
                     keys.append("right")
+                if event.key == pygame.K_SPACE:
+                    keys.append("put_bomb")
+            
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # 1 = left mouse button
                     mouse_buttons = True
@@ -354,7 +358,7 @@ def main():
         broken_walls.draw(screen)
         sturdy_walls.draw(screen)
         
-        all_sprites.update(dt, keys, mouse_buttons, [sturdy_walls, broken_walls])
+        all_sprites.update(dt, keys, mouse_buttons)
         all_sprites.draw(screen)
 
         pygame.display.flip()
