@@ -6,7 +6,7 @@ import subprocess
 import miniupnpc
 
 
-server_ip = "192.168.1.130"
+server_ip = "192.168.1.250"
 port = 5555
 
 # firewall rule to allow incoming connections on the specified port

@@ -38,7 +38,7 @@ class Player:
         if keys[pygame.K_DOWN]:
             self.y += self.move_speed
 
-conn = Network("192.168.1.130", 5555) # Network instance
+conn = Network("192.168.1.250", 5555) # Network instance
 data = conn.resive()  # Receive initial data from server
 
 player1 = Player(data["position"][0], data["position"][1], RectW, RectH, data["color"]) # Player instance
